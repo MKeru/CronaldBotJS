@@ -8,10 +8,10 @@ const rest = new REST({ version: '10' }).setToken(process.env.BOT_TOKEN);
 
 // for guild-based commands
 rest.put(Routes.applicationGuildCommands(process.env.CLIENT_ID, process.env.GUILD_ID), { body: [] })
-	.then(() => console.log('Successfully deleted guild commands.'))
+	.then(() => console.log('Successfully deleted test commands.'))
 	.catch(console.error);
 
 // for global commands
 rest.put(Routes.applicationCommands(process.env.CLIENT_ID), { body: [] })
-	.then(() => console.log('Successfully deleted application commands.'))
+	.then(() => console.log('Successfully deleted global commands.'))
 	.catch(console.error);
