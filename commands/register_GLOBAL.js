@@ -1,13 +1,5 @@
 const { SlashCommandBuilder, RoleManager, Colors, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
-const registeredGuilds = [];
-
-/* another way to create a role
-await interaction.guild.roles.create({
-	name: 'Cron',
-	color: Colors.grey,
-	reason: 'cron reason',
-});
-*/
+const { Guilds } = require('../database/database');
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -18,7 +10,7 @@ module.exports = {
 		.setDMPermission(false),
 
 	async execute(interaction) {
-		// FIXME: maybe ask if there is already a role 'CronToken Admin'
+		// TODO: maybe ask if there is already a role 'CronToken Admin'
 		// allow each user to register themself
 		// allow each user to remove themself (DELETE user and all their data pertaining to that server)
 		// allow server manager to unregister the server (DELETE all data pertaining to the server)
@@ -45,11 +37,11 @@ module.exports = {
 				// create RoleManager object
 				const rm = new RoleManager(interaction.guild);
 
-				// check if guild is already in list of registered guilds
-				if (!registeredGuilds.includes(interaction.guild.id)) {
+				const thisGuild = await Guilds.findOne({ where: { guildId: interaction.guild.id } });
 
-					// push guild to registration list
-					registeredGuilds.push(interaction.guild.id);
+				// check if guild is already in list of registered guilds
+				if (!thisGuild) {
+					await Guilds.create({ guildId: interaction.guild.id });
 
 					// check if server does not have the crontoken admin role
 					if (!interaction.guild.roles.cache.find(x => x.name === 'CronToken Admin')) {
@@ -68,10 +60,10 @@ module.exports = {
 						console.log(`CronToken role already in server ${interaction.guild.id}`);
 					}
 
-					console.log(registeredGuilds);
+					console.log(`${interaction.guild.id} has been registered.`);
 				}
 				// check for crontoken role existence
-				else if (registeredGuilds.includes(interaction.guild.id) && !interaction.guild.roles.cache.find(x => x.name === 'CronToken Admin')) {
+				else if (thisGuild && !interaction.guild.roles.cache.find(x => x.name === 'CronToken Admin')) {
 
 					await rm.create({
 						name: 'CronToken Admin',
