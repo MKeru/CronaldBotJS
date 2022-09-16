@@ -1,9 +1,9 @@
-const { Tokens, Guilds } = require('../database/database');
+import { Tokens, Guilds } from '../database/database';
 
 module.exports = {
 	name: 'ready',
 	once: true,
-	execute(client) {
+	execute(client: any) {
 		Tokens.sync({ force: true });
 		Guilds.sync({ force: true });
 		console.log('Tags successfully synced.');

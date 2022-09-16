@@ -8,7 +8,7 @@ const sequelize = new Sequelize('database', 'user', 'password', {
 	storage: 'database.sqlite',
 });
 
-const Tokens = sequelize.define('tokens', {
+export const Tokens = sequelize.define('tokens', {
 	guildId: Sequelize.INTEGER,
 	username: Sequelize.STRING,
 	tokens: {
@@ -18,7 +18,7 @@ const Tokens = sequelize.define('tokens', {
 	},
 });
 
-const Guilds = sequelize.define('guilds', {
+export const Guilds = sequelize.define('guilds', {
 	guildId: {
 		type: Sequelize.INTEGER,
 		unique: true,
@@ -26,4 +26,4 @@ const Guilds = sequelize.define('guilds', {
 	},
 });
 
-module.exports = { Tokens, Guilds };
+// module.exports = { Tokens, Guilds };
