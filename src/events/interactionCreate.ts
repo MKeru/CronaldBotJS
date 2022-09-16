@@ -1,6 +1,6 @@
 module.exports = {
 	name: 'interactionCreate',
-	execute(interaction) {
+	execute(interaction: any) {
 		try {
 			if (interaction.inGuild()) {
 				console.log(`${interaction.user.tag} in #${interaction.guildId}#${interaction.channel.name} triggered an interaction.`);

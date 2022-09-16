@@ -1,4 +1,5 @@
-const { SlashCommandBuilder } = require('discord.js');
+// const { SlashCommandBuilder } = require('discord.js');
+import { SlashCommandBuilder } from 'discord.js';
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -21,7 +22,7 @@ module.exports = {
 						.setName('number')
 						.setDescription('The number of tokens to give the target user.')
 						.setRequired(true))),
-	async execute(interaction) {
+	async execute(interaction: any) {
 		await interaction.reply(`Generated ${interaction.options.getInteger('number')} CronTokens for ${interaction.options.getUser('user')}.`);
 	},
 };

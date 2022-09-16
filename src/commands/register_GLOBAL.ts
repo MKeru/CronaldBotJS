@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, RoleManager, Colors, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+import { SlashCommandBuilder, Colors, ActionRowBuilder, ButtonBuilder, ButtonStyle, CommandInteraction } from 'discord.js';
 const { Guilds } = require('../database/database');
 
 module.exports = {
@@ -9,7 +9,7 @@ module.exports = {
 		.setDefaultMemberPermissions('8')
 		.setDMPermission(false),
 
-	async execute(interaction) {
+	async execute(interaction: CommandInteraction) {
 		// TODO: maybe ask if there is already a role 'CronToken Admin'
 		// allow each user to register themself
 		// allow each user to remove themself (DELETE user and all their data pertaining to that server)
@@ -18,7 +18,7 @@ module.exports = {
 		// check if server is already registered for CronToken usage AND has CronToken Admin role
 		// if so, end interaction
 		const checkGuild = await Guilds.findOne({ where: { guildId: interaction.guild.id } });
-		const roleExists = interaction.guild.roles.cache.find(x => x.name === 'CronToken Admin');
+		const roleExists = interaction.guild.roles.cache.find((x: any) => x.name === 'CronToken Admin');
 		if (checkGuild && roleExists) {
 			interaction.reply({ content: 'This server is already registered for CronToken usage and has the CronToken Admin role.', ephemeral: true });
 			return;
@@ -26,8 +26,7 @@ module.exports = {
 		// check if server is already registered for CronToken usage and does NOT have CronToken Admin role
 		else if (checkGuild && !roleExists) {
 			// create CronToken Admin role in guild
-			const rm = new RoleManager(interaction.guild);
-			await rm.create({
+			await interaction.guild.roles.create({
 				name: 'CronToken Admin',
 				color: Colors.Grey,
 			});
@@ -36,7 +35,7 @@ module.exports = {
 		}
 
 		// start building accept message
-		const row = new ActionRowBuilder()
+		const row = new ActionRowBuilder<ButtonBuilder>()
 			.addComponents(
 				new ButtonBuilder()
 					.setCustomId('accept')
@@ -54,7 +53,7 @@ module.exports = {
 		await interaction.reply({ content: 'This will register this server for CronToken usage. The server ID and registered users\' IDs will be stored in a database.' +
 			'\n\nYou may remove the server data entirely or individual users may remove their data at any time.\n\nPlease click the button below to register!', components: [row], ephemeral: true });
 
-		const filter = i => (i.customId === 'accept' || i.customId === 'decline') && i.user.id === interaction.user.id.toString();
+		const filter = (i: any) => (i.customId === 'accept' || i.customId === 'decline') && i.user.id === interaction.user.id.toString();
 		const collector = interaction.channel.createMessageComponentCollector({ filter, time: 15000 });
 
 		try {
@@ -65,8 +64,7 @@ module.exports = {
 					// check if CronToken Admin role does not exist
 					if (!roleExists) {
 						// create CronToken Admin role in guild
-						const rm = new RoleManager(interaction.guild);
-						await rm.create({
+						await interaction.guild.roles.create({
 							name: 'CronToken Admin',
 							color: Colors.Grey,
 						});

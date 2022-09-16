@@ -2,3 +2,6 @@
 config.json
 node_modules
 *.sqlite
+dist/
+.config/
+package-lock.json
