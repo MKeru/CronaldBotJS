@@ -6,7 +6,7 @@ module.exports = {
 		.setName('register')
 		.setDescription('Register your server for CronTokens!')
 		// only server administrators are permitted to use this command
-		.setDefaultMemberPermissions('8')
+		.setDefaultMemberPermissions('0')
 		.setDMPermission(false),
 
 	async execute(interaction: CommandInteraction) {
@@ -20,9 +20,10 @@ module.exports = {
 		const checkGuild = await Guilds.findOne({ where: { guildId: interaction.guild.id } });
 		const roleExists = interaction.guild.roles.cache.find((x: any) => x.name === 'CronToken Admin');
 		if (checkGuild && roleExists) {
-			interaction.reply({ content: 'This server is already registered for CronToken usage and has the CronToken Admin role.', ephemeral: true });
+			await interaction.reply({ content: 'This server is already registered for CronToken usage and has the CronToken Admin role.', ephemeral: true });
 			return;
 		}
+
 		// check if server is already registered for CronToken usage and does NOT have CronToken Admin role
 		else if (checkGuild && !roleExists) {
 			// create CronToken Admin role in guild
@@ -30,7 +31,7 @@ module.exports = {
 				name: 'CronToken Admin',
 				color: Colors.Grey,
 			});
-			interaction.reply({ content: 'This server is already registered for CronToken usage, but does not have CronToken Admin role (was it deleted?).\n\nIt has been generated.', ephemeral: true });
+			await interaction.reply({ content: 'This server is already registered for CronToken usage, but does not have CronToken Admin role (was it deleted?).\n\nIt has been generated.', ephemeral: true });
 			return;
 		}
 
@@ -51,13 +52,15 @@ module.exports = {
 
 		// warning message
 		await interaction.reply({ content: 'This will register this server for CronToken usage. The server ID and registered users\' IDs will be stored in a database.' +
-			'\n\nYou may remove the server data entirely or individual users may remove their data at any time.\n\nPlease click the button below to register!', components: [row], ephemeral: true });
+			'\n\nYou may remove the server data entirely or individual users may remove their data at any time.\n\nPlease click the accept button below to register!', components: [row], ephemeral: true });
 
 		const filter = (i: any) => (i.customId === 'accept' || i.customId === 'decline') && i.user.id === interaction.user.id.toString();
 		const collector = interaction.channel.createMessageComponentCollector({ filter, time: 15000 });
 
 		try {
 			collector.on('collect', async i => {
+				// stop collector
+				collector.stop();
 				if (i.customId === 'accept') {
 					// add guildId to database
 					await Guilds.create({ guildId: interaction.guild.id });
@@ -81,8 +84,18 @@ module.exports = {
 					console.log(`Server ${interaction.guild.id} declined registration for CronToken usage.`);
 				}
 			});
+			// timeout
+			collector.on('end', async collected => {
+				if (collected.size === 0) {
+					// stop collector
+					collector.stop();
+					await interaction.editReply({ content: 'Registration timed out.', components: [] });
+				}
+			});
 		}
 		catch (error) {
+			// stop collector
+			collector.stop();
 			console.log(error);
 		}
 	},
