@@ -9,12 +9,21 @@ const sequelize = new Sequelize('database', 'user', 'password', {
 });
 
 export const Tokens = sequelize.define('tokens', {
-	guildId: Sequelize.INTEGER,
-	username: Sequelize.STRING,
+	guildId: {
+		type: Sequelize.INTEGER,
+		allowNull: false,
+		unique: false,
+	},
+	userId: {
+		type: Sequelize.INTEGER,
+		allowNull: false,
+		unique: false,
+	},
 	tokens: {
 		type: Sequelize.INTEGER,
 		allowNull: false,
 		defaultValue: 0,
+		unique: false,
 	},
 });
 
