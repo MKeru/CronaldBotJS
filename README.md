@@ -1,2 +1,2 @@
 # CronaldBotJS
-CronaldBot written in JavaScript using gateways.
+Discord bot written using Discord.js.
