@@ -54,13 +54,16 @@ module.exports = {
 		await interaction.reply({ content: 'This will register this server for CronToken usage. The server ID and registered users\' IDs will be stored in a database.' +
 			'\n\nYou may remove the server data entirely or individual users may remove their data at any time.\n\nPlease click the accept button below to register!', components: [row], ephemeral: true });
 
+		// create collector for button interaction
 		const filter = (i: any) => (i.customId === 'accept' || i.customId === 'decline') && i.user.id === interaction.user.id.toString();
 		const collector = interaction.channel.createMessageComponentCollector({ filter, time: 15000 });
 
 		try {
-			collector.on('collect', async i => {
-				// stop collector
+			collector.on('collect', async (i: any) => {
+
+				// close collector
 				collector.stop();
+
 				if (i.customId === 'accept') {
 					// add guildId to database
 					await Guilds.create({ guildId: interaction.guild.id });
@@ -79,11 +82,13 @@ module.exports = {
 						console.log(`Server ${interaction.guild.id} was registered for CronToken usage. CronToken Admin role already exists.`);
 					}
 				}
+
 				else if (i.customId === 'decline') {
 					await i.update({ content: 'Declined registration for CronToken usage.', components: [] });
 					console.log(`Server ${interaction.guild.id} declined registration for CronToken usage.`);
 				}
 			});
+
 			// timeout
 			collector.on('end', async collected => {
 				if (collected.size === 0) {
@@ -93,6 +98,7 @@ module.exports = {
 				}
 			});
 		}
+		
 		catch (error) {
 			// stop collector
 			collector.stop();

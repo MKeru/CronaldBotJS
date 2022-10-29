@@ -7,7 +7,13 @@ import * as dotenv from 'dotenv';
 dotenv.config();
 
 // creates a new client instance
-const client = new Client({ intents: [GatewayIntentBits.Guilds] });
+const client = new Client({
+	intents: [
+		GatewayIntentBits.Guilds,
+		GatewayIntentBits.GuildMessages,
+		GatewayIntentBits.GuildVoiceStates,
+	],
+});
 
 client.commands = new Collection();
 const commandsPath = path.join(__dirname, 'commands');
